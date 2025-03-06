@@ -140,7 +140,7 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     fig_1 = px.bar(feature_importances, title="Feature Importance", labels={'value': 'Важность', 'index': 'Признаки'})
     st.plotly_chart(fig_1)
 
-    fig = px.scatter(
+    fig_2 = px.scatter(
     df,
     x='lead_time',
     y='booking_status',
@@ -151,4 +151,4 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     )
     
     # Отображаем график
-    st.plotly_chart(fig)
+    st.plotly_chart(fig_2)
