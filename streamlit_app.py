@@ -105,13 +105,7 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     st.progress(int(prediction_proba[1] * 100))
     st.write(f"**Вероятность отмены:** {prediction_proba[1]:.2f}")
 
-# Визуализация важности признаков
-st.subheader("📈 Важность признаков")
-feature_importances = pd.Series(rf_model.feature_importances_, index=X.columns).sort_values(ascending=False)
-fig = px.bar(feature_importances, title="Feature Importance", labels={'value': 'Важность', 'index': 'Признаки'})
-st.plotly_chart(fig)
-
-# Создаем DataFrame для визуализации прогресс-баров
+    # Создаем DataFrame для визуализации прогресс-баров
     df_prediction_proba = pd.DataFrame({
         'Canceled': [prediction_proba[1]],
         'Not Canceled': [prediction_proba[0]]
@@ -139,7 +133,9 @@ st.plotly_chart(fig)
         },
         hide_index=True
     )
-    
-    # Выводим предсказанный класс
-    result_class = "Canceled" if prediction == 1 else "Not Canceled"
-    st.success(f"Предсказание: **{result_class}**")
+
+# Визуализация важности признаков
+st.subheader("📈 Важность признаков")
+feature_importances = pd.Series(rf_model.feature_importances_, index=X.columns).sort_values(ascending=False)
+fig = px.bar(feature_importances, title="Feature Importance", labels={'value': 'Важность', 'index': 'Признаки'})
+st.plotly_chart(fig)
