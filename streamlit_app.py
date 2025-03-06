@@ -104,6 +104,39 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     st.progress(int(prediction_proba[1] * 100))
     st.write(f"**Вероятность отмены:** {prediction_proba[1]:.2f}")
 
+# Создаем DataFrame для визуализации прогресс-баров
+    df_prediction_proba = pd.DataFrame({
+        'Canceled': [prediction_proba[1]],
+        'Not Canceled': [prediction_proba[0]]
+    })
+
+    # Отображаем вероятности с прогресс-барами
+    st.subheader('📊 Вероятности предсказания')
+    st.dataframe(
+        df_prediction_proba,
+        column_config={
+            'Canceled': st.column_config.ProgressColumn(
+                'Canceled',
+                format='%f',
+                width='medium',
+                min_value=0,
+                max_value=1
+            ),
+            'Not Canceled': st.column_config.ProgressColumn(
+                'Not Canceled',
+                format='%f',
+                width='medium',
+                min_value=0,
+                max_value=1
+            ),
+        },
+        hide_index=True
+    )
+    
+    # Выводим предсказанный класс
+    result_class = "Canceled" if prediction == 1 else "Not Canceled"
+    st.success(f"Предсказание: **{result_class}**")
+
 # Визуализация важности признаков
 st.subheader("📈 Важность признаков")
 feature_importances = pd.Series(rf_model.feature_importances_, index=X.columns).sort_values(ascending=False)
