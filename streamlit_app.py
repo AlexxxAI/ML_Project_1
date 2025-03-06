@@ -2,117 +2,91 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.model_selection import train_test_split
 
-# Настройки страницы
-st.set_page_config(page_title="Прогноз отмены бронирования", layout="centered")
-
-# Заголовок приложения
-st.title("🏨 Прогнозирование отмены бронирования отеля")
-st.write("Введите параметры бронирования, и модель предскажет вероятность отмены.")
-
-# Загрузка данных
-df = pd.read_csv("https://raw.githubusercontent.com/AlexxxAI/ML_Project_1/refs/heads/master/Hotel_Reservations.csv")
+# Загружаем данные
+url = "https://raw.githubusercontent.com/AlexxxAI/ML_Project_1/refs/heads/master/Hotel_Reservations.csv"
+df = pd.read_csv(url)
 df.drop(columns=['Booking_ID'], inplace=True)
 
-# Кодирование категориальных признаков
+# Кодируем категориальные признаки
 label_encoders = {}
-for col in ['type_of_meal_plan', 'room_type_reserved', 'market_segment_type']:
+categorical_features = ['type_of_meal_plan', 'room_type_reserved', 'market_segment_type']
+for col in categorical_features:
     le = LabelEncoder()
     df[col] = le.fit_transform(df[col])
     label_encoders[col] = le
 
-# Разделение данных
+# Разделяем данные на признаки и целевую переменную
 X = df.drop('booking_status', axis=1)
-y = df['booking_status']
+y = (df['booking_status'] == 'Canceled').astype(int)  # Преобразуем в 0 и 1
+
+# Разделяем на обучающую и тестовую выборки
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
-# Масштабирование числовых данных
+# Масштабируем числовые признаки
 scaler = StandardScaler()
 numerical_columns = X_train.select_dtypes(include=['int64', 'float64']).columns
 X_train[numerical_columns] = scaler.fit_transform(X_train[numerical_columns])
 X_test[numerical_columns] = scaler.transform(X_test[numerical_columns])
 
-# Обучение модели
-rf_model = RandomForestClassifier(random_state=42, class_weight='balanced', max_depth=10, 
+# Обучаем модель
+rf_model = RandomForestClassifier(random_state=42, class_weight='balanced', max_depth=10,
                                   min_samples_leaf=1, n_estimators=300, max_features='sqrt')
 rf_model.fit(X_train, y_train)
 
-# Интерфейс боковой панели
-st.sidebar.header("Введите данные бронирования")
+# Интерфейс Streamlit
+st.title("🔮 Прогноз отмены бронирования")
+st.sidebar.header("Введите данные о бронировании")
 
+# Поля для ввода параметров
 user_input = {}
-feature_labels = {
-    "lead_time": "Время до заезда (дней)",
-    "no_of_adults": "Количество взрослых",
-    "no_of_children": "Количество детей",
-    "no_of_weekend_nights": "Ночи в выходные",
-    "no_of_week_nights": "Ночи в будни",
-    "required_car_parking_space": "Нужна парковка (0 - Нет, 1 - Да)",
-    "no_of_special_requests": "Число особых запросов",
-    "avg_price_per_room": "Средняя цена номера",
-}
+user_input['no_of_adults'] = st.sidebar.slider("Количество взрослых", 1, 5, 2)
+user_input['no_of_children'] = st.sidebar.slider("Количество детей", 0, 5, 0)
+user_input['no_of_weekend_nights'] = st.sidebar.slider("Ночи в выходные", 0, 5, 1)
+user_input['no_of_week_nights'] = st.sidebar.slider("Ночи в будни", 0, 10, 2)
+user_input['type_of_meal_plan'] = st.sidebar.selectbox("Тип питания", label_encoders['type_of_meal_plan'].classes_)
+user_input['required_car_parking_space'] = st.sidebar.checkbox("Нужна парковка?")
+user_input['room_type_reserved'] = st.sidebar.selectbox("Тип номера", label_encoders['room_type_reserved'].classes_)
+user_input['lead_time'] = st.sidebar.slider("Дни до заезда", 0, 500, 100)
+user_input['arrival_year'] = st.sidebar.slider("Год заезда", 2017, 2021, 2019)
+user_input['arrival_month'] = st.sidebar.slider("Месяц заезда", 1, 12, 6)
+user_input['arrival_date'] = st.sidebar.slider("Дата заезда", 1, 31, 15)
+user_input['market_segment_type'] = st.sidebar.selectbox("Тип клиента", label_encoders['market_segment_type'].classes_)
+user_input['repeated_guest'] = st.sidebar.checkbox("Постоянный клиент?")
+user_input['no_of_previous_cancellations'] = st.sidebar.slider("Предыдущие отмены", 0, 10, 0)
+user_input['no_of_previous_bookings_not_canceled'] = st.sidebar.slider("Бронирований без отмен", 0, 50, 0)
+user_input['avg_price_per_room'] = st.sidebar.slider("Средняя цена номера", 0, 500, 100)
+user_input['no_of_special_requests'] = st.sidebar.slider("Спецзапросы", 0, 5, 0)
 
-# Ввод параметров пользователем
-for col, label in feature_labels.items():
-    if col in ["no_of_adults", "no_of_children", "no_of_weekend_nights", "no_of_week_nights", "no_of_special_requests"]:
-        user_input[col] = st.sidebar.number_input(label, min_value=0, max_value=int(df[col].max()), value=int(df[col].mean()))
-    elif col == "required_car_parking_space":
-        user_input[col] = st.sidebar.selectbox(label, [0, 1], format_func=lambda x: "Да" if x == 1 else "Нет")
-    else:
-        user_input[col] = st.sidebar.slider(label, float(df[col].min()), float(df[col].max()), float(df[col].mean()))
-
-# Подготовка данных пользователя
+# Преобразуем ввод пользователя в DataFrame
 input_df = pd.DataFrame([user_input])
-input_scaled = scaler.transform(input_df)
+
+# Кодируем категориальные признаки
+for col in categorical_features:
+    input_df[col] = label_encoders[col].transform(input_df[col])
+
+# Масштабируем числовые признаки
+input_df[numerical_columns] = scaler.transform(input_df[numerical_columns])
 
 # Предсказание
-if st.sidebar.button("Сделать предсказание"):
-    prediction = rf_model.predict(input_scaled)
-    prediction_proba = rf_model.predict_proba(input_scaled)
-    df_prediction_proba = pd.DataFrame(prediction_proba, columns=["Не отменено", "Отменено"])
-    df_prediction_proba = df_prediction_proba.round(2)
+if st.sidebar.button("🔍 Сделать предсказание"):
+    prediction = rf_model.predict(input_df)[0]
+    prediction_proba = rf_model.predict_proba(input_df)[0]
     
-    st.subheader("🔍 Результаты предсказания")
-    
-    if prediction[0] == 1:
-        st.markdown("<div style='background-color: #ffcccc; padding: 10px; border-radius: 5px;'><strong>⚠️ Высокая вероятность отмены бронирования!</strong></div>", unsafe_allow_html=True)
+    st.subheader("📊 Результат предсказания:")
+    if prediction == 1:
+        st.error("⚠️ Высокая вероятность отмены бронирования!")
     else:
-        st.success("✅ Низкая вероятность отмены бронирования.")
+        st.success("✅ Бронирование скорее всего не будет отменено.")
     
-    # Вывод вероятностей
-    st.dataframe(
-        df_prediction_proba,
-        column_config={
-            "Не отменено": st.column_config.ProgressColumn(
-                "Не отменено",
-                format="%.2f",
-                width="medium",
-                min_value=0,
-                max_value=1
-            ),
-            "Отменено": st.column_config.ProgressColumn(
-                "Отменено",
-                format="%.2f",
-                width="medium",
-                min_value=0,
-                max_value=1
-            ),
-        },
-        hide_index=True
-    )
-    
-    # Скачивание предсказания
-    csv = df_prediction_proba.to_csv(index=False).encode('utf-8')
-    st.download_button("📥 Скачать предсказание", data=csv, file_name="prediction.csv", mime="text/csv")
+    st.progress(int(prediction_proba[1] * 100))
+    st.write(f"**Вероятность отмены:** {prediction_proba[1]:.2f}")
 
 # Визуализация важности признаков
-st.subheader("📊 Важность признаков")
-feature_importances = pd.DataFrame({
-    'Признак': X.columns,
-    'Значимость': rf_model.feature_importances_
-}).sort_values(by='Значимость', ascending=False)
-fig_importance = px.bar(feature_importances, x='Признак', y='Значимость', title='Важность признаков модели')
-st.plotly_chart(fig_importance)
+st.subheader("📈 Важность признаков")
+feature_importances = pd.Series(rf_model.feature_importances_, index=X.columns).sort_values(ascending=False)
+fig = px.bar(feature_importances, title="Feature Importance", labels={'value': 'Важность', 'index': 'Признаки'})
+st.plotly_chart(fig)
