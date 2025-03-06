@@ -20,6 +20,8 @@ df = pd.read_csv(url)
 # Удаляем колонку 'Booking_ID'
 df = df.drop(columns=['Booking_ID'])
 
+df['booking_status'] = df['booking_status'].replace({'Not_Canceled': 0, 'Canceled': 1})
+
 # Кодируем категориальные признаки
 label_encoder = LabelEncoder()
 df['type_of_meal_plan'] = label_encoder.fit_transform(df['type_of_meal_plan'])
