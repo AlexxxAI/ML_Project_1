@@ -64,13 +64,6 @@ user_input['no_of_special_requests'] = st.sidebar.slider("Спецзапросы
 # Преобразуем ввод пользователя в DataFrame
 input_df = pd.DataFrame([user_input])
 
-# Кодируем категориальные признаки
-for col in categorical_features:
-    input_df[col] = label_encoders[col].transform(input_df[col])
-
-# Масштабируем числовые признаки
-input_df[numerical_columns] = scaler.transform(input_df[numerical_columns])
-
 with st.expander("Data"):
     st.write("X")
     st.dataframe(X)
@@ -83,6 +76,13 @@ with st.expander('Input features'):
     st.write('**Combined bookings data** (input row + original data)')
     combined_df = pd.concat([input_df, X], axis=0)
     st.dataframe(combined_df)
+
+# Кодируем категориальные признаки
+for col in categorical_features:
+    input_df[col] = label_encoders[col].transform(input_df[col])
+
+# Масштабируем числовые признаки
+input_df[numerical_columns] = scaler.transform(input_df[numerical_columns])
 
 with st.expander('Data preparation'):
     st.write('**Encoded X (input booking)**')
