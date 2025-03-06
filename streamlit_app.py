@@ -5,6 +5,8 @@ import plotly.express as px
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
+
 
 # Кэшируем загрузку данных
 @st.cache_data
