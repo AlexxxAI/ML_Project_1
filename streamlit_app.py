@@ -52,6 +52,7 @@ X_test[numerical_columns] = scaler.transform(X_test[numerical_columns])
 rf_model = RandomForestClassifier(random_state=42, class_weight='balanced', max_depth=10,
                                   min_samples_leaf=1, n_estimators=300, max_features='sqrt')
 rf_model.fit(X_train, y_train)
+y_pred = rf_model.predict(X_test)
 
 # Поля для ввода параметров
 user_input = {}
@@ -141,11 +142,6 @@ if st.sidebar.button("🔍 Сделать предсказание"):
 
     # Визуализация важности признаков
     st.subheader("📈 Data Visualization")
-
-    # Круговая диаграмма вероятностей
-    fig_pie = px.pie(values=prediction_proba, names=["Не отменено", "Отменено"],
-                      title="Вероятности предсказания")
-    st.plotly_chart(fig_pie)
 
     # Визуализация важности признаков
     feature_importances = pd.Series(rf_model.feature_importances_, index=X.columns).sort_values(ascending=False)
