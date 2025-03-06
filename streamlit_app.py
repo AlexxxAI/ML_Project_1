@@ -6,10 +6,16 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import train_test_split
 
+# Кэшируем загрузку данных
+@st.cache_data
+def load_data(url):
+    df = pd.read_csv(url)
+    df.drop(columns=['Booking_ID'], inplace=True)
+    return df
+
 # Загружаем данные
 url = "https://raw.githubusercontent.com/AlexxxAI/ML_Project_1/refs/heads/master/Hotel_Reservations.csv"
-df = pd.read_csv(url)
-df.drop(columns=['Booking_ID'], inplace=True)
+df = load_data(url)
 
 # Кодируем категориальные признаки
 label_encoders = {}
@@ -133,9 +139,23 @@ if st.sidebar.button("🔍 Сделать предсказание"):
 
     # Визуализация важности признаков
     st.subheader("📈 Data Visualization")
+
+    # Круговая диаграмма вероятностей
+    fig_pie = px.pie(values=prediction_proba, names=["Не отменено", "Отменено"],
+                      title="Вероятности предсказания")
+    st.plotly_chart(fig_pie)
+
+    # Визуализация важности признаков
     feature_importances = pd.Series(rf_model.feature_importances_, index=X.columns).sort_values(ascending=False)
     fig_1 = px.bar(feature_importances, title="Feature Importance", labels={'value': 'Важность', 'index': 'Признаки'})
     st.plotly_chart(fig_1)
+
+    # Матрица ошибок
+    cm = confusion_matrix(y_test, y_pred)
+    fig_cm = px.imshow(cm, text_auto=True, color_continuous_scale='blues',
+                        labels={'x': 'Предсказано', 'y': 'Истинное значение'})
+    fig_cm.update_layout(title_text="Confusion Matrix")
+    st.plotly_chart(fig_cm)
 
     # Распределение отмененных бронирований по времени до заезда
     fig_2 = px.scatter(
