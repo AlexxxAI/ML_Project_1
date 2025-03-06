@@ -158,14 +158,15 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     st.plotly_chart(fig_cm)
 
     # Распределение отмененных бронирований по времени до заезда
-    fig_2 = px.scatter(
-    df,
+    fig_2 = px.bar(
+    df.groupby(['lead_time', 'booking_status']).size().reset_index(name='count'),
     x='lead_time',
-    y='booking_status',
+    y='count',
     color='booking_status',
-    title='Зависимость отмены бронирования от времени до заезда',
-    labels={'lead_time': 'Время до заезда (дни)', 'booking_status': 'Отмена бронирования'},
-    color_continuous_scale='Viridis'
+    title='Количество бронирований в зависимости от времени до заезда',
+    labels={'lead_time': 'Время до заезда (дни)', 'count': 'Количество бронирований'},
+    color_discrete_sequence=['red', 'green'],
+    barmode='group'
     )
     st.plotly_chart(fig_2)
 
