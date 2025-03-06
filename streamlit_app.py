@@ -29,10 +29,7 @@ st.sidebar.header("Введите данные о бронировании")
 
 # Отображаем датасет
 with st.expander("Data"):
-    st.write("X")
-    st.dataframe(X)
-    st.write("y")
-    st.dataframe(y)
+    st.write(df)
 
 # Разделяем на обучающую и тестовую выборки
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
@@ -140,6 +137,7 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     fig_1 = px.bar(feature_importances, title="Feature Importance", labels={'value': 'Важность', 'index': 'Признаки'})
     st.plotly_chart(fig_1)
 
+    # Распределение отмененных бронирований по времени до заезда
     fig_2 = px.scatter(
     df,
     x='lead_time',
@@ -149,6 +147,32 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     labels={'lead_time': 'Время до заезда (дни)', 'booking_status': 'Отмена бронирования'},
     color_continuous_scale='Viridis'
     )
-    
-    # Отображаем график
     st.plotly_chart(fig_2)
+
+    df['booking_status'] = df['booking_status'].apply(lambda x: 'Canceled' if x == 'Canceled' else 'Not Canceled')
+    fig_3 = px.histogram(df, x='lead_time', color='booking_status', barmode='group',
+                         title='Распределение отмененных бронирований по времени до заезда')
+    st.plotly_chart(fig_3)
+
+    # Влияние количества специальных запросов на отмену бронирования (no_of_special_requests)
+    fig_4 = px.bar(df.groupby(['no_of_special_requests', 'booking_status']).size().reset_index(name='count'),
+                   x='no_of_special_requests', y='count', color='booking_status', barmode='group',
+                   title='Влияние количества специальных запросов на отмену бронирования')
+    st.plotly_chart(fig_4)
+
+    # Влияние средней цены на номер на отмену бронирования (avg_price_per_room)
+    fig_5 = px.scatter(df, x='avg_price_per_room', y='lead_time', color='booking_status',
+                       title='Зависимость отмены бронирования от средней цены номера')
+    st.plotly_chart(fig_5)
+
+    # Распределение отмененных бронирований по типу клиента (market_segment_type)
+    fig_6 = px.bar(df.groupby(['market_segment_type', 'booking_status']).size().reset_index(name='count'),
+                   x='market_segment_type', y='count', color='booking_status', barmode='group',
+                   title='Распределение отмененных бронирований по типу клиента')
+    st.plotly_chart(fig_6)
+
+    # График 5: Влияние месяца заезда на отмену бронирования (arrival_month)
+    fig_7 = px.bar(df.groupby(['arrival_month', 'booking_status']).size().reset_index(name='count'),
+                   x='arrival_month', y='count', color='booking_status', barmode='group',
+                   title='Влияние месяца заезда на отмену бронирования')
+    st.plotly_chart(fig_7)
