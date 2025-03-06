@@ -50,26 +50,35 @@ rf_model.fit(X_train, y_train)
 
 # Интерфейс боковой панели с русскими названиями признаков
 st.sidebar.header("Введите параметры бронирования:")
-feature_names = {
+user_input = {}
+
+feature_map = {
     "no_of_adults": "Количество взрослых",
     "no_of_children": "Количество детей",
-    "no_of_weekend_nights": "Число ночей (выходные)",
-    "no_of_week_nights": "Число ночей (будни)",
-    "required_car_parking_space": "Требуется парковка",
+    "no_of_weekend_nights": "Ночей в выходные",
+    "no_of_week_nights": "Ночей в будни",
+    "required_car_parking_space": "Нужна парковка",
     "lead_time": "Дней до заезда",
     "arrival_month": "Месяц заезда",
     "arrival_date": "Дата заезда",
     "repeated_guest": "Повторный гость",
-    "no_of_previous_cancellations": "Предыдущие отмены",
-    "no_of_previous_bookings_not_canceled": "Ранее не отмененные бронирования",
-    "avg_price_per_room": "Средняя цена за номер",
-    "no_of_special_requests": "Число особых запросов"
+    "no_of_previous_cancellations": "Число отмен",
+    "no_of_previous_bookings_not_canceled": "Число успешных броней",
+    "avg_price_per_room": "Средняя цена номера",
+    "no_of_special_requests": "Число пожеланий"
 }
 
-user_input = {}
 for col in X.columns:
-    user_input[col] = st.sidebar.slider(feature_names.get(col, col), float(df[col].min()), float(df[col].max()), float(df[col].mean()))
+    if col in ["no_of_adults", "no_of_children", "no_of_weekend_nights", "no_of_week_nights", "no_of_special_requests"]:
+        user_input[col] = st.sidebar.number_input(feature_map[col], min_value=0, max_value=int(df[col].max()), value=int(df[col].mean()), step=1)
+    elif col in ["required_car_parking_space", "repeated_guest"]:
+        user_input[col] = st.sidebar.radio(feature_map[col], [0, 1], format_func=lambda x: "Да" if x == 1 else "Нет")
+    elif col in ["arrival_month", "arrival_date"]:
+        user_input[col] = st.sidebar.selectbox(feature_map[col], sorted(df[col].unique()))
+    else:
+        user_input[col] = st.sidebar.number_input(feature_map[col], float(df[col].min()), float(df[col].max()), float(df[col].mean()))
 
+# Преобразуем ввод в DataFrame
 input_df = pd.DataFrame([user_input])
 input_scaled = scaler.transform(input_df)
 
@@ -77,23 +86,19 @@ input_scaled = scaler.transform(input_df)
 if st.sidebar.button("🔍 Сделать предсказание"):
     prediction = rf_model.predict(input_scaled)
     prediction_proba = rf_model.predict_proba(input_scaled)
-    
-    st.subheader("📌 Результат предсказания:")
-    if prediction[0] == 1:
-        st.error("❌ Высокая вероятность отмены бронирования!")
-    else:
-        st.success("✅ Бронирование, скорее всего, не будет отменено.")
-    
-    st.write("**Вероятности предсказания:**")
-    st.write(f"Не отменено: {prediction_proba[0][0]:.2f}, Отменено: {prediction_proba[0][1]:.2f}")
+    result = "✅ Бронирование подтверждено" if prediction[0] == 0 else "⚠️ Высокая вероятность отмены!"
+    st.subheader("Результат предсказания:")
+    st.markdown(f"**{result}**")
 
-    # График важности признаков
-    st.subheader("🔎 Важность признаков")
-    feature_importances = pd.DataFrame({'Признак': X.columns, 'Важность': rf_model.feature_importances_})
-    feature_importances = feature_importances.sort_values(by='Важность', ascending=True)
-    fig, ax = plt.subplots(figsize=(8, 6))
-    ax.barh(feature_importances['Признак'], feature_importances['Важность'], color='royalblue')
-    ax.set_xlabel("Важность")
-    ax.set_ylabel("Признак")
-    ax.set_title("Важность признаков в модели Random Forest")
-    st.pyplot(fig)
+    st.subheader("Вероятности предсказания:")
+    st.write(f"- Подтверждение: {prediction_proba[0][0]:.2f}")
+    st.write(f"- Отмена: {prediction_proba[0][1]:.2f}")
+
+# График важности признаков
+st.subheader("📊 Важность признаков")
+importances = pd.Series(rf_model.feature_importances_, index=X.columns).sort_values(ascending=False)
+fig, ax = plt.subplots()
+importances.plot(kind='bar', ax=ax)
+ax.set_title("Важность признаков")
+ax.set_ylabel("Значимость")
+st.pyplot(fig)
