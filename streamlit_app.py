@@ -71,20 +71,27 @@ for col in categorical_features:
 # Масштабируем числовые признаки
 input_df[numerical_columns] = scaler.transform(input_df[numerical_columns])
 
-# Инициализируем переменную состояния, если ее нет
-if "predict" not in st.session_state:
-    st.session_state.predict = False
+with st.expander("Data"):
+    st.write("X")
+    st.dataframe(X)
+    st.write("y")
+    st.dataframe(y)
 
-# Обработчик нажатия кнопки
-def make_prediction():
-    st.session_state.predict = True
+with st.expander('Input features'):
+    st.write('**Input booking**')
+    st.dataframe(input_df)
+    st.write('**Combined bookings data** (input row + original data)')
+    combined_df = pd.concat([input_df, X], axis=0)
+    st.dataframe(combined_df)
+
+with st.expander('Data preparation'):
+    st.write('**Encoded X (input booking)**')
+    st.dataframe(input_df)
+    st.write('**Encoded y**')
+    st.write(y)
 
 # Кнопка предсказания
-if st.sidebar.button("🔍 Сделать предсказание", on_click=make_prediction):
-    st.session_state.predict = True
-
-# Выполняем предсказание только если кнопка нажата
-if st.session_state.predict:
+if st.sidebar.button("🔍 Сделать предсказание"):
     prediction = rf_model.predict(input_df)[0]
     prediction_proba = rf_model.predict_proba(input_df)[0]
     
