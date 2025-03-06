@@ -23,6 +23,10 @@ for col in categorical_features:
 X = df.drop('booking_status', axis=1)
 y = (df['booking_status'] == 'Canceled').astype(int)
 
+# Интерфейс Streamlit
+st.title("🔮 Прогноз отмены бронирования")
+st.sidebar.header("Введите данные о бронировании")
+
 # Отображаем датасет
 with st.expander("Data"):
     st.write("X")
@@ -43,10 +47,6 @@ X_test[numerical_columns] = scaler.transform(X_test[numerical_columns])
 rf_model = RandomForestClassifier(random_state=42, class_weight='balanced', max_depth=10,
                                   min_samples_leaf=1, n_estimators=300, max_features='sqrt')
 rf_model.fit(X_train, y_train)
-
-# Интерфейс Streamlit
-st.title("🔮 Прогноз отмены бронирования")
-st.sidebar.header("Введите данные о бронировании")
 
 # Поля для ввода параметров
 user_input = {}
