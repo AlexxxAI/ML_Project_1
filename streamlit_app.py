@@ -134,8 +134,8 @@ if st.sidebar.button("🔍 Сделать предсказание"):
         hide_index=True
     )
 
-# Визуализация важности признаков
-st.subheader("📈 Важность признаков")
-feature_importances = pd.Series(rf_model.feature_importances_, index=X.columns).sort_values(ascending=False)
-fig = px.bar(feature_importances, title="Feature Importance", labels={'value': 'Важность', 'index': 'Признаки'})
-st.plotly_chart(fig)
+    # Визуализация важности признаков
+    st.subheader("📈 Важность признаков")
+    feature_importances = pd.Series(rf_model.feature_importances_, index=X.columns).sort_values(ascending=False)
+    fig = px.bar(feature_importances, title="Feature Importance", labels={'value': 'Важность', 'index': 'Признаки'})
+    st.plotly_chart(fig)
