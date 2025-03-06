@@ -21,7 +21,14 @@ for col in categorical_features:
 
 # Разделяем данные на признаки и целевую переменную
 X = df.drop('booking_status', axis=1)
-y = (df['booking_status'] == 'Canceled').astype(int)  # Преобразуем в 0 и 1
+y = (df['booking_status'] == 'Canceled').astype(int)
+
+# Отображаем датасет
+with st.expander("Data"):
+    st.write("X")
+    st.dataframe(X)
+    st.write("y")
+    st.dataframe(y)
 
 # Разделяем на обучающую и тестовую выборки
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
@@ -64,12 +71,6 @@ user_input['no_of_special_requests'] = st.sidebar.slider("Спецзапросы
 # Преобразуем ввод пользователя в DataFrame
 input_df = pd.DataFrame([user_input])
 
-with st.expander("Data"):
-    st.write("X")
-    st.dataframe(X)
-    st.write("y")
-    st.dataframe(y)
-
 with st.expander('Input features'):
     st.write('**Input booking**')
     st.dataframe(input_df)
@@ -104,6 +105,12 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     st.progress(int(prediction_proba[1] * 100))
     st.write(f"**Вероятность отмены:** {prediction_proba[1]:.2f}")
 
+# Визуализация важности признаков
+st.subheader("📈 Важность признаков")
+feature_importances = pd.Series(rf_model.feature_importances_, index=X.columns).sort_values(ascending=False)
+fig = px.bar(feature_importances, title="Feature Importance", labels={'value': 'Важность', 'index': 'Признаки'})
+st.plotly_chart(fig)
+
 # Создаем DataFrame для визуализации прогресс-баров
     df_prediction_proba = pd.DataFrame({
         'Canceled': [prediction_proba[1]],
@@ -117,14 +124,14 @@ if st.sidebar.button("🔍 Сделать предсказание"):
         column_config={
             'Canceled': st.column_config.ProgressColumn(
                 'Canceled',
-                format='%f',
+                format='%.1f',
                 width='medium',
                 min_value=0,
                 max_value=1
             ),
             'Not Canceled': st.column_config.ProgressColumn(
                 'Not Canceled',
-                format='%f',
+                format='%.1f',
                 width='medium',
                 min_value=0,
                 max_value=1
@@ -136,9 +143,3 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     # Выводим предсказанный класс
     result_class = "Canceled" if prediction == 1 else "Not Canceled"
     st.success(f"Предсказание: **{result_class}**")
-
-# Визуализация важности признаков
-st.subheader("📈 Важность признаков")
-feature_importances = pd.Series(rf_model.feature_importances_, index=X.columns).sort_values(ascending=False)
-fig = px.bar(feature_importances, title="Feature Importance", labels={'value': 'Важность', 'index': 'Признаки'})
-st.plotly_chart(fig)
