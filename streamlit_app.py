@@ -38,7 +38,7 @@ rf_model = RandomForestClassifier(random_state=42, class_weight='balanced', max_
 rf_model.fit(X_train, y_train)
 
 # Интерфейс Streamlit
-st.title("🏨 Прогнозирование отмены бронирования отеля")
+st.title("🔮 Прогноз отмены бронирования")
 st.sidebar.header("Введите данные о бронировании")
 
 # Поля для ввода параметров
@@ -71,8 +71,20 @@ for col in categorical_features:
 # Масштабируем числовые признаки
 input_df[numerical_columns] = scaler.transform(input_df[numerical_columns])
 
-# Предсказание
-if st.sidebar.button("🔍 Сделать предсказание"):
+# Инициализируем переменную состояния, если ее нет
+if "predict" not in st.session_state:
+    st.session_state.predict = False
+
+# Обработчик нажатия кнопки
+def make_prediction():
+    st.session_state.predict = True
+
+# Кнопка предсказания
+if st.sidebar.button("🔍 Сделать предсказание", on_click=make_prediction):
+    st.session_state.predict = True
+
+# Выполняем предсказание только если кнопка нажата
+if st.session_state.predict:
     prediction = rf_model.predict(input_df)[0]
     prediction_proba = rf_model.predict_proba(input_df)[0]
     
