@@ -50,11 +50,6 @@ rf_model.fit(X_train, y_train)
 
 # Поля для ввода параметров
 user_input = {}
-user_input['lead_time'] = st.sidebar.slider("Дни до заезда", 0, 500, 100)
-user_input['no_of_special_requests'] = st.sidebar.slider("Количество специальных запросов (например, доп. кровать)", 0, 5, 0)
-user_input['avg_price_per_room'] = st.sidebar.slider("Средняя цена номера", 0, 500, 100)
-user_input['market_segment_type'] = st.sidebar.selectbox("Тип клиента", label_encoders['market_segment_type'].classes_)
-user_input['arrival_month'] = st.sidebar.slider("Месяц заезда", 1, 12, 6)
 user_input['no_of_adults'] = st.sidebar.slider("Количество взрослых", 1, 5, 2)
 user_input['no_of_children'] = st.sidebar.slider("Количество детей", 0, 5, 0)
 user_input['no_of_weekend_nights'] = st.sidebar.slider("Ночи в выходные", 0, 5, 1)
@@ -62,9 +57,16 @@ user_input['no_of_week_nights'] = st.sidebar.slider("Ночи в будни", 0,
 user_input['type_of_meal_plan'] = st.sidebar.selectbox("Тип питания", label_encoders['type_of_meal_plan'].classes_)
 user_input['required_car_parking_space'] = st.sidebar.checkbox("Нужна парковка?")
 user_input['room_type_reserved'] = st.sidebar.selectbox("Тип номера", label_encoders['room_type_reserved'].classes_)
+user_input['lead_time'] = st.sidebar.slider("Дни до заезда", 0, 500, 100)
+user_input['arrival_year'] = st.sidebar.slider("Год заезда", 2017, 2021, 2019)
+user_input['arrival_month'] = st.sidebar.slider("Месяц заезда", 1, 12, 6)
+user_input['arrival_date'] = st.sidebar.slider("Дата заезда", 1, 31, 15)
+user_input['market_segment_type'] = st.sidebar.selectbox("Тип клиента", label_encoders['market_segment_type'].classes_)
 user_input['repeated_guest'] = st.sidebar.checkbox("Постоянный клиент?")
 user_input['no_of_previous_cancellations'] = st.sidebar.slider("Предыдущие отмены", 0, 10, 0)
 user_input['no_of_previous_bookings_not_canceled'] = st.sidebar.slider("Бронирований без отмен", 0, 50, 0)
+user_input['avg_price_per_room'] = st.sidebar.slider("Средняя цена номера", 0, 500, 100)
+user_input['no_of_special_requests'] = st.sidebar.slider("Количество специальных запросов (например, доп. кровать)", 0, 5, 0)
 
 # Преобразуем ввод пользователя в DataFrame
 input_df = pd.DataFrame([user_input])
