@@ -135,12 +135,11 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     )
 
     # Визуализация важности признаков
-    st.subheader("📈 Важность признаков")
+    st.subheader("📈 Data Visualization")
     feature_importances = pd.Series(rf_model.feature_importances_, index=X.columns).sort_values(ascending=False)
     fig_1 = px.bar(feature_importances, title="Feature Importance", labels={'value': 'Важность', 'index': 'Признаки'})
     st.plotly_chart(fig_1)
 
-    st.subheader('Data Visualization')
     fig = px.scatter(
     df,
     x='lead_time',
