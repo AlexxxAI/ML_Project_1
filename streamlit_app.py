@@ -28,7 +28,7 @@ for col in categorical_features:
     label_encoders[col] = le
 
 # Разделяем данные на признаки и целевую переменную
-X = df.drop('booking_status', axis=1)
+X = df.drop(columns=['booking_status', 'arrival_year', 'arrival_date'], axis=1)
 y = (df['booking_status'] == 'Canceled').astype(int)
 
 # Интерфейс Streamlit
@@ -49,9 +49,13 @@ X_train[numerical_columns] = scaler.fit_transform(X_train[numerical_columns])
 X_test[numerical_columns] = scaler.transform(X_test[numerical_columns])
 
 # Обучаем модель
-rf_model = RandomForestClassifier(random_state=42, class_weight='balanced', max_depth=10,
-                                  min_samples_leaf=1, n_estimators=300, max_features='sqrt')
-rf_model.fit(X_train, y_train)
+@st.cache_resource
+def train_model(X_train, y_train):
+    model = RandomForestClassifier(random_state=42, class_weight='balanced', max_depth=10,
+                                   min_samples_leaf=1, n_estimators=300, max_features='sqrt')
+    model.fit(X_train, y_train)
+    return model
+rf_model = train_model(X_train_scaled, y_train)
 y_pred = rf_model.predict(X_test)
 
 # Поля для ввода параметров
