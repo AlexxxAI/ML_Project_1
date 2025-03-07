@@ -158,21 +158,14 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     st.plotly_chart(fig_cm)
 
     # Распределение отмененных бронирований по времени до заезда
-    fig_2 = px.bar(
-    df.groupby(['lead_time', 'booking_status']).size().reset_index(name='count'),
-    x='lead_time',
-    y='count',
-    color='booking_status',
-    title='Количество бронирований в зависимости от времени до заезда',
-    labels={'lead_time': 'Время до заезда (дни)', 'count': 'Количество бронирований'},
-    color_discrete_sequence=['red', 'green'],
-    barmode='group'
-    )
-    st.plotly_chart(fig_2)
-
     df['booking_status'] = df['booking_status'].apply(lambda x: 'Canceled' if x == 'Canceled' else 'Not Canceled')
     fig_3 = px.histogram(df, x='lead_time', color='booking_status', barmode='group',
-                         title='Распределение отмененных бронирований по времени до заезда')
+                         title='Распределение отмененных бронирований по времени до заезда',
+                         color_discrete_sequence=['#FF0000', '#0000FF'])
+    fig_3.update_layout(
+        width=1000,
+        height=800
+    )
     st.plotly_chart(fig_3)
 
     # Влияние количества специальных запросов на отмену бронирования (no_of_special_requests)
