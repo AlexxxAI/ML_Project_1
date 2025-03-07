@@ -109,38 +109,41 @@ if st.sidebar.button("🔍 Сделать предсказание"):
         st.error("⚠️ Высокая вероятность отмены бронирования!")
     else:
         st.success("✅ Бронирование скорее всего не будет отменено.")
-    
-    st.progress(int(prediction_proba[1] * 100))
-    st.write(f"**Вероятность отмены:** {prediction_proba[1]:.2f}")
 
-    # Создаем DataFrame для визуализации прогресс-баров
-    df_prediction_proba = pd.DataFrame({
-        'Canceled': [prediction_proba[1]],
-        'Not Canceled': [prediction_proba[0]]
-    })
+     st.metric("Вероятность отмены", f"{prediction_proba[1]:.2f}")
+    
+    # st.progress(int(prediction_proba[1] * 100))
+    # st.write(f"**Вероятность отмены:** {prediction_proba[1]:.2f}")
+
+    # # Создаем DataFrame для визуализации прогресс-баров
+    # df_prediction_proba = pd.DataFrame({
+    #     'Canceled': [prediction_proba[1]],
+    #     'Not Canceled': [prediction_proba[0]]
+    # })
 
     # Отображаем вероятности с прогресс-барами
-    st.subheader('📊 Вероятности предсказания')
-    st.dataframe(
-        df_prediction_proba,
-        column_config={
-            'Canceled': st.column_config.ProgressColumn(
-                'Canceled',
-                format='%.1f',
-                width='medium',
-                min_value=0,
-                max_value=1
-            ),
-            'Not Canceled': st.column_config.ProgressColumn(
-                'Not Canceled',
-                format='%.1f',
-                width='medium',
-                min_value=0,
-                max_value=1
-            ),
-        },
-        hide_index=True
-    )
+    # st.subheader('📊 Вероятности предсказания')
+    
+    # st.dataframe(
+    #     df_prediction_proba,
+    #     column_config={
+    #         'Canceled': st.column_config.ProgressColumn(
+    #             'Canceled',
+    #             format='%.1f',
+    #             width='medium',
+    #             min_value=0,
+    #             max_value=1
+    #         ),
+    #         'Not Canceled': st.column_config.ProgressColumn(
+    #             'Not Canceled',
+    #             format='%.1f',
+    #             width='medium',
+    #             min_value=0,
+    #             max_value=1
+    #         ),
+    #     },
+    #     hide_index=True
+    # )
 
     # Визуализация важности признаков
     st.subheader("📈 Data Visualization")
@@ -165,10 +168,7 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     fig_3 = px.histogram(df, x='lead_time', color='booking_status', barmode='group',
                          title='Распределение отмененных бронирований по времени до заезда',
                          color_discrete_sequence=['#FF0000', '#0000FF'])
-    fig_3.update_layout(
-        width=1000,
-        height=800
-    )
+    fig_3.update_layout(auto_size=True)
     st.plotly_chart(fig_3)
 
     # Влияние количества специальных запросов на отмену бронирования (no_of_special_requests)
@@ -201,4 +201,14 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     fig_7 = px.bar(df.groupby(['arrival_month', 'booking_status']).size().reset_index(name='count'),
                    x='arrival_month', y='count', color='booking_status', barmode='group',
                    title='Влияние месяца заезда на отмену бронирования')
+    fig_7.update_xaxes(title_text="Месяц заезда")
+    fig_7.update_yaxes(title_text="Количество")
     st.plotly_chart(fig_7)
+
+# Улучшение стиля заголовков
+st.markdown("""
+    <style>
+        .stTitle {font-size: 28px; font-weight: bold; color: #2E3A87;}
+        .stSubheader {font-size: 24px; color: #1F2D56;}
+    </style>
+""", unsafe_allow_html=True)
