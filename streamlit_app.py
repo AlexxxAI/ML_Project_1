@@ -178,17 +178,11 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     st.plotly_chart(fig_4)
 
     # Влияние средней цены на номер на отмену бронирования (avg_price_per_room)
-    fig_5 = px.box(df, x='booking_status', y='avg_price_per_room', color='booking_status',
-               title='Распределение средней цены номера в зависимости от статуса бронирования',
-               color_discrete_map={'Canceled': 'red', 'Not Canceled': 'blue'})
-    st.plotly_chart(fig_5)
-
     df_grouped = df.groupby('booking_status')['avg_price_per_room'].mean().reset_index()
-    
-    fig_5i = px.bar(df_grouped, x='booking_status', y='avg_price_per_room', color='booking_status',
+    fig_5 = px.bar(df_grouped, x='booking_status', y='avg_price_per_room', color='booking_status',
                    title='Средняя цена номера в зависимости от статуса бронирования',
                    text_auto='.2f', color_discrete_map={'Canceled': 'red', 'Not Canceled': 'blue'})
-    st.plotly_chart(fig_5i)
+    st.plotly_chart(fig_5)
 
     # Распределение отмененных бронирований по типу клиента (market_segment_type)
     df['market_segment_type'] = label_encoders['market_segment_type'].inverse_transform(df['market_segment_type'])
