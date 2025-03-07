@@ -168,8 +168,8 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     y='booking_status',
     color='booking_status',
     title='Распределение отмены бронирования в зависимости от времени до заезда'
-)
-st.plotly_chart(fig)
+    )
+    st.plotly_chart(fig)
 
     # Распределение отмененных бронирований по времени до заезда
     df['booking_status'] = df['booking_status'].apply(lambda x: 'Canceled' if x == 'Canceled' else 'Not Canceled')
