@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import train_test_split
@@ -162,16 +164,33 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     st.plotly_chart(fig_cm)
 
     # 3D график по трем главным призакам
-    fig = px.scatter_3d(
-        df,
-        x='lead_time',  # Ось X - время до заезда
-        y='no_of_special_requests',  # Ось Y - количество специальных запросов
-        z='avg_price_per_room',  # Ось Z - средняя цена за номер
-        color='booking_status',  # Цвет точек зависит от статуса бронирования
-        title='3D график: Влияние признаков на статус бронирования',
-        labels={'lead_time': 'Время до заезда (дни)', 'no_of_special_requests': 'Количество специальных запросов', 'avg_price_per_room': 'Средняя цена за номер'}
-    )
-    st.plotly_chart(fig)
+    # fig = px.scatter_3d(
+    #     df,
+    #     x='lead_time',  # Ось X - время до заезда
+    #     y='no_of_special_requests',  # Ось Y - количество специальных запросов
+    #     z='avg_price_per_room',  # Ось Z - средняя цена за номер
+    #     color='booking_status',  # Цвет точек зависит от статуса бронирования
+    #     title='3D график: Влияние признаков на статус бронирования',
+    #     labels={'lead_time': 'Время до заезда (дни)', 'no_of_special_requests': 'Количество специальных запросов', 'avg_price_per_room': 'Средняя цена за номер'}
+    # )
+    # st.plotly_chart(fig)
+
+    df_sorted = df.sort_values(by='lead_time', ascending=False).head(100)
+    x = df_sorted['lead_time']
+    y = df_sorted['no_of_special_requests']
+    z = df_sorted['avg_price_per_room']
+    colors = df_sorted['booking_status'].map({'Canceled': 'red', 'Not Canceled': 'blue'})  # Цвет точек по статусу
+    
+    fig = plt.figure(figsize=(10, 7))
+    ax = fig.add_subplot(111, projection='3d')
+    sc = ax.scatter(x, y, z, c=colors, label='Booking Status', s=50)
+    ax.set_xlabel('Время до заезда (дни)')
+    ax.set_ylabel('Количество специальных запросов')
+    ax.set_zlabel('Средняя цена за номер')
+    ax.set_title('3D график: Топ 100 элементов по статусу бронирования')
+    legend = ax.legend(loc='upper left')
+    legend.legendHandles[0]._sizes = [100]
+    plt.show()
 
     # Распределение отмененных бронирований по времени до заезда
     df['booking_status'] = df['booking_status'].apply(lambda x: 'Canceled' if x == 'Canceled' else 'Not Canceled')
