@@ -176,7 +176,7 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     # st.plotly_chart(fig)
 
     # Сортируем данные
-    df_sorted = df.sort_values(by='lead_time', ascending=False).head(100)
+    df_sorted = df.sort_values(by='lead_time', ascending=False)
     x = df_sorted['lead_time']
     y = df_sorted['no_of_special_requests']
     z = df_sorted['avg_price_per_room']
