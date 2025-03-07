@@ -8,3 +8,4 @@ catboost
 xgboost
 lightgbm
 seaborn
+mpl_toolkits
