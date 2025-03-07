@@ -198,9 +198,8 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     # Добавляем легенду и настраиваем размер маркеров
     legend = ax.legend(loc='upper left', markerscale=2)  # Используем markerscale для изменения размера маркера в легенде
     
-    # Отображаем график
-    plt.show()
-
+    # Отображаем график в Streamlit
+    st.pyplot(fig)  # Вместо plt.show() используем st.pyplot
     # Распределение отмененных бронирований по времени до заезда
     df['booking_status'] = df['booking_status'].apply(lambda x: 'Canceled' if x == 'Canceled' else 'Not Canceled')
     fig_3 = px.histogram(df, x='lead_time', color='booking_status', barmode='group',
