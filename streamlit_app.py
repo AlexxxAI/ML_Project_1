@@ -55,7 +55,7 @@ def train_model(X_train, y_train):
                                    min_samples_leaf=1, n_estimators=300, max_features='sqrt')
     model.fit(X_train, y_train)
     return model
-rf_model = train_model(X_train_scaled, y_train)
+rf_model = train_model(X_train, y_train)
 y_pred = rf_model.predict(X_test)
 
 # Поля для ввода параметров
