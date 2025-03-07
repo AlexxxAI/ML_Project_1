@@ -176,19 +176,32 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     # st.plotly_chart(fig)
 
     # Сортируем данные
-    df_sorted = df.sort_values(by='lead_time', ascending=False).head(5000)
+    df_sorted = df.sort_values(by='lead_time', ascending=False).head(100)
     x = df_sorted['lead_time']
     y = df_sorted['no_of_special_requests']
     z = df_sorted['avg_price_per_room']
-    colors = df_sorted['booking_status'].map({'Canceled': 'red', 'Not Canceled': 'blue'})
+    
+    # Преобразуем значения booking_status в числовые значения (0 - Not Canceled, 1 - Canceled)
+    color_map = {'Not Canceled': 0, 'Canceled': 1}
+    colors = df_sorted['booking_status'].map(color_map)
+    
+    # Создаём 3D график
     fig = plt.figure(figsize=(10, 7))
     ax = fig.add_subplot(111, projection='3d')
-    sc = ax.scatter(x, y, z, c=colors, label='Booking Status', s=50)
+    
+    # Создаём scatter plot с числовыми значениями для цвета
+    sc = ax.scatter(x, y, z, c=colors, cmap='coolwarm', label='Booking Status', s=50)
+    
+    # Настройки осей
     ax.set_xlabel('Время до заезда (дни)')
     ax.set_ylabel('Количество специальных запросов')
     ax.set_zlabel('Средняя цена за номер')
     ax.set_title('3D график: Топ 100 элементов по статусу бронирования')
-    legend = ax.legend(loc='upper left', markerscale=2)  
+    
+    # Добавляем легенду и настраиваем размер маркеров
+    legend = ax.legend(loc='upper left', markerscale=2)  # Используем markerscale для изменения размера маркера в легенде
+    
+    # Отображаем график в Streamlit
     st.pyplot(fig)
     
     # Распределение отмененных бронирований по времени до заезда
