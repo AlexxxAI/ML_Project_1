@@ -110,40 +110,38 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     else:
         st.success("✅ Бронирование скорее всего не будет отменено.")
 
-    st.metric("Вероятность отмены", f"{prediction_proba[1]:.2f}")
-    
-    # st.progress(int(prediction_proba[1] * 100))
-    # st.write(f"**Вероятность отмены:** {prediction_proba[1]:.2f}")
+    st.progress(int(prediction_proba[1] * 100))
+    st.write(f"**Вероятность отмены:** {prediction_proba[1]:.2f}")
 
-    # # Создаем DataFrame для визуализации прогресс-баров
-    # df_prediction_proba = pd.DataFrame({
-    #     'Canceled': [prediction_proba[1]],
-    #     'Not Canceled': [prediction_proba[0]]
-    # })
+    # Создаем DataFrame для визуализации прогресс-баров
+    df_prediction_proba = pd.DataFrame({
+        'Canceled': [prediction_proba[1]],
+        'Not Canceled': [prediction_proba[0]]
+    })
 
-    # Отображаем вероятности с прогресс-барами
-    # st.subheader('📊 Вероятности предсказания')
+    Отображаем вероятности с прогресс-барами
+    st.subheader('📊 Вероятности предсказания')
     
-    # st.dataframe(
-    #     df_prediction_proba,
-    #     column_config={
-    #         'Canceled': st.column_config.ProgressColumn(
-    #             'Canceled',
-    #             format='%.1f',
-    #             width='medium',
-    #             min_value=0,
-    #             max_value=1
-    #         ),
-    #         'Not Canceled': st.column_config.ProgressColumn(
-    #             'Not Canceled',
-    #             format='%.1f',
-    #             width='medium',
-    #             min_value=0,
-    #             max_value=1
-    #         ),
-    #     },
-    #     hide_index=True
-    # )
+    st.dataframe(
+        df_prediction_proba,
+        column_config={
+            'Canceled': st.column_config.ProgressColumn(
+                'Canceled',
+                format='%.1f',
+                width='medium',
+                min_value=0,
+                max_value=1
+            ),
+            'Not Canceled': st.column_config.ProgressColumn(
+                'Not Canceled',
+                format='%.1f',
+                width='medium',
+                min_value=0,
+                max_value=1
+            ),
+        },
+        hide_index=True
+    )
 
     # Визуализация важности признаков
     st.subheader("📈 Data Visualization")
