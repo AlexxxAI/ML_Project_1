@@ -151,10 +151,12 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     st.plotly_chart(fig_1)
 
     # Матрица ошибок
-    cm = confusion_matrix(y_test, y_pred)
-    fig_cm = px.imshow(cm, text_auto=True, color_continuous_scale='blues',
+    labels = ["Не отменена", "Отменена"]
+    fig_cm = px.imshow(cm, text_auto=True, color_continuous_scale='Blues',
                         labels={'x': 'Предсказано', 'y': 'Истинное значение'})
-    fig_cm.update_layout(title_text="Confusion Matrix")
+    fig_cm.update_xaxes(tickvals=[0, 1], ticktext=labels)
+    fig_cm.update_yaxes(tickvals=[0, 1], ticktext=labels)
+    fig_cm.update_layout(title_text="Матрица ошибок")
     st.plotly_chart(fig_cm)
 
     # Распределение отмененных бронирований по времени до заезда
