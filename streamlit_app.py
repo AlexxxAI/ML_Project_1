@@ -151,6 +151,7 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     st.plotly_chart(fig_1)
 
     # Матрица ошибок
+    cm = confusion_matrix(y_test, y_pred)
     labels = ["Не отменена", "Отменена"]
     fig_cm = px.imshow(cm, text_auto=True, color_continuous_scale='Blues',
                         labels={'x': 'Предсказано', 'y': 'Истинное значение'})
