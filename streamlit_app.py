@@ -166,7 +166,7 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     fig_3 = px.histogram(df, x='lead_time', color='booking_status', barmode='group',
                          title='Распределение отмененных бронирований по времени до заезда',
                          color_discrete_sequence=['#FF0000', '#0000FF'])
-    fig_3.update_layout(auto_size=True)
+    fig_3.update_layout(autosize=True)
     st.plotly_chart(fig_3)
 
     # Влияние количества специальных запросов на отмену бронирования (no_of_special_requests)
