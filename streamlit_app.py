@@ -161,6 +161,16 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     fig_cm.update_layout(title_text="Матрица ошибок")
     st.plotly_chart(fig_cm)
 
+    #scatter для распределение отмененных бронирований по времени до заезда
+    fig = px.scatter(
+    df,
+    x='lead_time',
+    y='booking_status',
+    color='booking_status',
+    title='Распределение отмены бронирования в зависимости от времени до заезда'
+)
+st.plotly_chart(fig)
+
     # Распределение отмененных бронирований по времени до заезда
     df['booking_status'] = df['booking_status'].apply(lambda x: 'Canceled' if x == 'Canceled' else 'Not Canceled')
     fig_3 = px.histogram(df, x='lead_time', color='booking_status', barmode='group',
