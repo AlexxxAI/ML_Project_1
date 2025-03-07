@@ -175,30 +175,36 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     # )
     # st.plotly_chart(fig)
 
-    # Сортируем данные
-    df_sorted = df.sort_values(by='lead_time', ascending=False)
+    # Отбираем первые 3000 строк
+    df_sorted = df.head(3000)
+    
+    # Смотрим на количество строк после фильтрации
+    st.write(f"Количество строк после фильтрации: {len(df_sorted)}")
+    st.write(df_sorted.head())  # Проверим данные
+    
+    # Определим x, y, z для 3D графика
     x = df_sorted['lead_time']
     y = df_sorted['no_of_special_requests']
     z = df_sorted['avg_price_per_room']
     
-    # Преобразуем значения booking_status в числовые значения (0 - Not Canceled, 1 - Canceled)
-    color_map = {'Not Canceled': 0, 'Canceled': 1}
-    colors = df_sorted['booking_status'].map(color_map)
+    # Преобразуем значения booking_status в числовые значения
+    # Красный для отмененных (Canceled), синий для не отмененных (Not Canceled)
+    colors = df_sorted['booking_status'].map({'Canceled': 'red', 'Not Canceled': 'blue'})
     
     # Создаём 3D график
     fig = plt.figure(figsize=(10, 7))
     ax = fig.add_subplot(111, projection='3d')
     
-    # Создаём scatter plot с числовыми значениями для цвета
-    sc = ax.scatter(x, y, z, c=colors, cmap='coolwarm', label='Booking Status', s=50)
+    # Создаём scatter plot
+    sc = ax.scatter(x, y, z, c=colors, label='Booking Status', s=50)
     
     # Настройки осей
     ax.set_xlabel('Время до заезда (дни)')
     ax.set_ylabel('Количество специальных запросов')
     ax.set_zlabel('Средняя цена за номер')
-    ax.set_title('3D график: Топ 100 элементов по статусу бронирования')
+    ax.set_title('3D график: Топ 3000 элементов по статусу бронирования')
     
-    # Добавляем легенду и настраиваем размер маркеров
+    # Добавляем легенду
     legend = ax.legend(loc='upper left', markerscale=2)  # Используем markerscale для изменения размера маркера в легенде
     
     # Отображаем график в Streamlit
