@@ -183,11 +183,16 @@ if st.sidebar.button("🔍 Сделать предсказание"):
     st.plotly_chart(fig_5)
 
     # Распределение отмененных бронирований по типу клиента (market_segment_type)
-    df['market_segment_type'] = df['market_segment_type'].astype(str)
-    fig_6 = px.bar(df.groupby(['market_segment_type', 'booking_status']).size().reset_index(name='count'),
-                   x='market_segment_type', y='count', color='booking_status', barmode='group',
-                   title='Распределение отмененных бронирований по типу клиента',
-                   category_orders={"market_segment_type": ['Offline', 'Online', 'Corporate', 'Aviation', 'Complementary']})
+    df['market_segment_type'] = label_encoders['market_segment_type'].inverse_transform(df['market_segment_type'])
+    fig_6 = px.bar(
+        df.groupby(['market_segment_type', 'booking_status']).size().reset_index(name='count'),
+        x='market_segment_type',
+        y='count',
+        color='booking_status',
+        barmode='group',
+        title='Распределение отмененных бронирований по типу клиента',
+        color_discrete_map={'Canceled': 'red', 'Not Canceled': 'blue'}
+    )
     st.plotly_chart(fig_6)
 
     # График 5: Влияние месяца заезда на отмену бронирования (arrival_month)
